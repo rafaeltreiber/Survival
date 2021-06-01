@@ -29,6 +29,7 @@ const Animal = {
   secondsToFeed: 120,
   secondsToDieByStarvation: 120,
   secondsToHeat: 120,
+  direction: 0, // Clockwise with 0 being north
 };
 
 function createMap() {
@@ -39,6 +40,32 @@ function createMap() {
   }
 }
 
+function createInitialPopulation() {
+  var a, b;
+  snakes.push(createAnimal("male"));
+  snakes.push(createAnimal("female"));
+
+  for (a = 0, b = 0; a < 4; a++, b++) {
+    frogs.push(b <= 1 ? createAnimal("male") : createAnimal("female"));
+  }
+
+  for (a = 0, b = 0; a < 8; a++, b++) {
+    flies.push(b <= 3 ? createAnimal("male") : createAnimal("female"));
+  }
+
+  for (let c = 0; c < snakes.length; c++) {
+    map[snakes[c].x][snakes[c].y] = 2;
+  }
+
+  for (let c = 0; c < frogs.length; c++) {
+    map[frogs[c].x][frogs[c].y] = 3;
+  }
+
+  for (let c = 0; c < flies.length; c++) {
+    map[flies[c].x][flies[c].y] = 4;
+  }
+}
+
 function createAnimal(sex) {
   let x;
   let y;
@@ -46,6 +73,7 @@ function createAnimal(sex) {
   const secondsToFeed = Math.floor(Math.random() * 100);
   const secondsToDieByStarvation = Math.floor(Math.random() * 120);
   let secondsToHeat = 999;
+  const direction = Math.floor(Math.random() * 3);
 
   if (sex == "female") secondsToHeat = Math.floor(Math.random() * 120);
 
@@ -62,7 +90,213 @@ function createAnimal(sex) {
     secondsToFeed,
     secondsToDieByStarvation,
     secondsToHeat,
+    direction,
   };
+}
+
+function move() {
+  let possibilities = [];
+
+  for (let a = 0; a < snakes.length; a++) {
+    if (snakes[a].direction === 0) {
+      if (map[snakes[a].x - 1][snakes[a].y] != 0) possibilities.push(0);
+      if (map[snakes[a].x][snakes[a].y + 1] != 0) possibilities.push(1);
+      if (map[snakes[a].x][snakes[a].y - 1] != 0) possibilities.push(3);
+      //only goes backwards if there is no other option to go
+      if (
+        map[snakes[a].x - 1][snakes[a].y] === 0 &&
+        map[snakes[a].x][snakes[a].y + 1] === 0 &&
+        map[snakes[a].x][snakes[a].y - 1] === 0
+      )
+        possibilities.push(2);
+    } else if (snakes[a].direction === 1) {
+      if (map[snakes[a].x][snakes[a].y + 1] != 0) possibilities.push(1);
+      if (map[snakes[a].x + 1][snakes[a].y] != 0) possibilities.push(2);
+      if (map[snakes[a].x - 1][snakes[a].y] != 0) possibilities.push(0);
+      //only goes backwards if there is no other option to go
+      if (
+        map[snakes[a].x][snakes[a].y + 1] === 0 &&
+        map[snakes[a].x + 1][snakes[a].y] === 0 &&
+        map[snakes[a].x - 1][snakes[a].y] === 0
+      )
+        possibilities.push(3);
+    } else if (snakes[a].direction === 2) {
+      if (map[snakes[a].x + 1][snakes[a].y] != 0) possibilities.push(2);
+      if (map[snakes[a].x][snakes[a].y - 1] != 0) possibilities.push(3);
+      if (map[snakes[a].x][snakes[a].y + 1] != 0) possibilities.push(1);
+      //only goes backwards if there is no other option to go
+      if (
+        map[snakes[a].x + 1][snakes[a].y] === 0 &&
+        map[snakes[a].x + 1][snakes[a].y] === 0 &&
+        map[snakes[a].x][snakes[a].y + 1] === 0
+      )
+        possibilities.push(0);
+    } else if (snakes[a].direction === 3) {
+      if (map[snakes[a].x][snakes[a].y - 1] != 0) possibilities.push(3);
+      if (map[snakes[a].x - 1][snakes[a].y] != 0) possibilities.push(0);
+      if (map[snakes[a].x + 1][snakes[a].y] != 0) possibilities.push(2);
+      //only goes backwards if there is no other option to go
+      if (
+        map[snakes[a].x][snakes[a].y - 1] === 0 &&
+        map[snakes[a].x - 1][snakes[a].y] === 0 &&
+        map[snakes[a].x + 1][snakes[a].y] === 0
+      )
+        possibilities.push(1);
+    }
+
+    let chosen =
+      possibilities[Math.floor(Math.random() * possibilities.length)];
+    
+    snakes[a].direction = chosen;
+    map[snakes[a].x][snakes[a].y] = 1;
+
+    if (snakes[a].direction === 0) {
+      snakes[a].x--;
+    } else if (snakes[a].direction === 1) {
+      snakes[a].y++;
+    } else if (snakes[a].direction === 2) {
+      snakes[a].x++;
+    } else if (snakes[a].direction === 3) {
+      snakes[a].y--;
+    }
+
+    map[snakes[a].x][snakes[a].y] = 2;
+    possibilities = [];
+  }
+
+  for (let a = 0; a < frogs.length; a++) {
+    if (frogs[a].direction === 0) {
+      if (map[frogs[a].x - 1][frogs[a].y] != 0) possibilities.push(0);
+      if (map[frogs[a].x][frogs[a].y + 1] != 0) possibilities.push(1);
+      if (map[frogs[a].x][frogs[a].y - 1] != 0) possibilities.push(3);
+      //only goes backwards if there is no other option to go
+      if (
+        map[frogs[a].x - 1][frogs[a].y] === 0 &&
+        map[frogs[a].x][frogs[a].y + 1] === 0 &&
+        map[frogs[a].x][frogs[a].y - 1] === 0
+      )
+        possibilities.push(2);
+    } else if (frogs[a].direction === 1) {
+      if (map[frogs[a].x][frogs[a].y + 1] != 0) possibilities.push(1);
+      if (map[frogs[a].x + 1][frogs[a].y] != 0) possibilities.push(2);
+      if (map[frogs[a].x - 1][frogs[a].y] != 0) possibilities.push(0);
+      //only goes backwards if there is no other option to go
+      if (
+        map[frogs[a].x][frogs[a].y + 1] === 0 &&
+        map[frogs[a].x + 1][frogs[a].y] === 0 &&
+        map[frogs[a].x - 1][frogs[a].y] === 0
+      )
+        possibilities.push(3);
+    } else if (frogs[a].direction === 2) {
+      if (map[frogs[a].x + 1][frogs[a].y] != 0) possibilities.push(2);
+      if (map[frogs[a].x][frogs[a].y - 1] != 0) possibilities.push(3);
+      if (map[frogs[a].x][frogs[a].y + 1] != 0) possibilities.push(1);
+      //only goes backwards if there is no other option to go
+      if (
+        map[frogs[a].x + 1][frogs[a].y] === 0 &&
+        map[frogs[a].x + 1][frogs[a].y] === 0 &&
+        map[frogs[a].x][frogs[a].y + 1] === 0
+      )
+        possibilities.push(0);
+    } else if (frogs[a].direction === 3) {
+      if (map[frogs[a].x][frogs[a].y - 1] != 0) possibilities.push(3);
+      if (map[frogs[a].x - 1][frogs[a].y] != 0) possibilities.push(0);
+      if (map[frogs[a].x + 1][frogs[a].y] != 0) possibilities.push(2);
+      //only goes backwards if there is no other option to go
+      if (
+        map[frogs[a].x][frogs[a].y - 1] === 0 &&
+        map[frogs[a].x - 1][frogs[a].y] === 0 &&
+        map[frogs[a].x + 1][frogs[a].y] === 0
+      )
+        possibilities.push(1);
+    }
+
+    let chosen =
+      possibilities[Math.floor(Math.random() * possibilities.length)];
+    frogs[a].direction = chosen;
+    map[frogs[a].x][frogs[a].y] = 1;
+
+    if (frogs[a].direction === 0) {
+      frogs[a].x--;
+    } else if (frogs[a].direction === 1) {
+      frogs[a].y++;
+    } else if (frogs[a].direction === 2) {
+      frogs[a].x++;
+    } else if (frogs[a].direction === 3) {
+      frogs[a].y--;
+    }
+
+    map[frogs[a].x][frogs[a].y] = 3;
+    possibilities = [];
+  }
+
+  for (let a = 0; a < flies.length; a++) {
+    if (flies[a].direction === 0) {
+      if (map[flies[a].x - 1][flies[a].y] != 0) possibilities.push(0);
+      if (map[flies[a].x][flies[a].y + 1] != 0) possibilities.push(1);
+      if (map[flies[a].x][flies[a].y - 1] != 0) possibilities.push(3);
+      //only goes backwards if there is no other option to go
+      if (
+        map[flies[a].x - 1][flies[a].y] === 0 &&
+        map[flies[a].x][flies[a].y + 1] === 0 &&
+        map[flies[a].x][flies[a].y - 1] === 0
+      )
+        possibilities.push(2);
+    } else if (flies[a].direction === 1) {
+      if (map[flies[a].x][flies[a].y + 1] != 0) possibilities.push(1);
+      if (map[flies[a].x + 1][flies[a].y] != 0) possibilities.push(2);
+      if (map[flies[a].x - 1][flies[a].y] != 0) possibilities.push(0);
+      //only goes backwards if there is no other option to go
+      if (
+        map[flies[a].x][flies[a].y + 1] === 0 &&
+        map[flies[a].x + 1][flies[a].y] === 0 &&
+        map[flies[a].x - 1][flies[a].y] === 0
+      )
+        possibilities.push(3);
+    } else if (flies[a].direction === 2) {
+      if (map[flies[a].x + 1][flies[a].y] != 0) possibilities.push(2);
+      if (map[flies[a].x][flies[a].y - 1] != 0) possibilities.push(3);
+      if (map[flies[a].x][flies[a].y + 1] != 0) possibilities.push(1);
+      //only goes backwards if there is no other option to go
+      if (
+        map[flies[a].x + 1][flies[a].y] === 0 &&
+        map[flies[a].x + 1][flies[a].y] === 0 &&
+        map[flies[a].x][flies[a].y + 1] === 0
+      )
+        possibilities.push(0);
+    } else if (flies[a].direction === 3) {
+      if (map[flies[a].x][flies[a].y - 1] != 0) possibilities.push(3);
+      if (map[flies[a].x - 1][flies[a].y] != 0) possibilities.push(0);
+      if (map[flies[a].x + 1][flies[a].y] != 0) possibilities.push(2);
+      //only goes backwards if there is no other option to go
+      if (
+        map[flies[a].x][flies[a].y - 1] === 0 &&
+        map[flies[a].x - 1][flies[a].y] === 0 &&
+        map[flies[a].x + 1][flies[a].y] === 0
+      )
+        possibilities.push(1);
+    }
+
+    let chosen =
+      possibilities[Math.floor(Math.random() * possibilities.length)];
+    flies[a].direction = chosen;
+    map[flies[a].x][flies[a].y] = 1;
+
+    if (flies[a].direction === 0) {
+      flies[a].x--;
+    } else if (flies[a].direction === 1) {
+      flies[a].y++;
+    } else if (flies[a].direction === 2) {
+      flies[a].x++;
+    } else if (flies[a].direction === 3) {
+      flies[a].y--;
+    }
+
+    map[flies[a].x][flies[a].y] = 4;
+    possibilities = [];
+  }
+
+  
 }
 
 function getTileDrawing(posX, posY) {
@@ -73,6 +307,10 @@ function getTileDrawing(posX, posY) {
       return "./images/white.png";
     case 2:
       return "./images/red.png";
+    case 3:
+      return "./images/green.png";
+    case 4:
+      return "./images/gray.png";
   }
 }
 
@@ -899,19 +1137,12 @@ function paintMap() {
   imagem1919.src = getTileDrawing(19, 19);
 }
 
-//createMap();
-paintMap();
 let snakes = [];
 let frogs = [];
 let flies = [];
-let temp = "imagem = 400";
-temp.src = "./images/red.png";
+createInitialPopulation();
 
-const snake = createAnimal("male");
-const snake2 = createAnimal("female");
-map[snake.x][snake.y] = 2;
-map[snake2.x][snake2.y] = 2;
-paintMap();
-snakes.push(snake);
-snakes.push(snake2);
-console.log(snakes);
+setInterval(() => {
+  move();
+  paintMap();
+}, 1000);
