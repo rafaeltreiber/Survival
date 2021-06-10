@@ -100,7 +100,7 @@ function createAnimal(type, sex) {
       } else if (this.type === "frog") {
         verifiyAnimalToKillAt(this.x, this.y, "fly");
       }
-      this.secondsToFeed = 120;
+      //this.secondsToFeed = 120;
     },
     tryMating() {
       if (this.secondsToHeat > 0) return;
