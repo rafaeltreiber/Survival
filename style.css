@@ -1,0 +1,17 @@
+.full {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-left: 2vw;
+  margin-top: 2vw;
+  width: 75vw;
+}
+
+.map {
+  display: flex;
+  margin: 0, 50px, 0, 50px;
+}
+
+.info {
+  margin-right: 4vw;
+}
