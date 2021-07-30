@@ -134,9 +134,10 @@ function verifiyAnimalToKillAt(x, y, type) {
   }
 }
 
-function verifiyOpositeSexAt(x, y, type, sex) {
+function verifiyOpositeSexAt(x, y, type, sex) {  
   if (type === "snake") {
-    snakes.forEach((snake) => {
+    if (snakes.length > 100) return;
+    snakes.map((snake) => {
       if (snake.x === x && snake.y === y) {
         if (
           (snake.sex === "male" && sex === "female") ||
@@ -145,13 +146,16 @@ function verifiyOpositeSexAt(x, y, type, sex) {
           const coinFlip = Math.floor(Math.random() * 2);
           if (coinFlip === 0) snakes.push(createAnimal("snake", "male"));
           else snakes.push(createAnimal("snake", "female"));
+          snake.secondsToHeat = 120;
           console.log("snake mated");
+          return snake;
         }
       }
     });
   }
   else if (type === "frog") {
-    frogs.forEach((frog) => {
+    if (frogs.length > 100) return;
+    frogs.map((frog) => {
       if (frog.x === x && frog.y === y) {
         if (
           (frog.sex === "male" && sex === "female") ||
@@ -160,13 +164,15 @@ function verifiyOpositeSexAt(x, y, type, sex) {
           const coinFlip = Math.floor(Math.random() * 2);
           if (coinFlip === 0) frogs.push(createAnimal("frog", "male"));
           else frogs.push(createAnimal("frog", "female"));
+          frog.secondsToHeat = 120;
           console.log("frog mated");
         }
       }
     });
   }
   else if (type === "fly") {
-    flies.forEach((fly) => {
+    if (flies.length > 100) return;
+    flies.map((fly) => {
       if (fly.x === x && fly.y === y) {
         if (
           (fly.sex === "male" && sex === "female") ||
@@ -175,6 +181,7 @@ function verifiyOpositeSexAt(x, y, type, sex) {
           const coinFlip = Math.floor(Math.random() * 2);
           if (coinFlip === 0) flies.push(createAnimal("fly", "male"));
           else flies.push(createAnimal("fly", "female"));
+          fly.secondsToHeat = 120;
           console.log("fly mated");
         }
       }
